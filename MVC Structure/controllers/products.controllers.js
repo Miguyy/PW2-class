@@ -21,22 +21,26 @@ export const createProduct = (req, res) => {
   const newProduct = { id: nextId, name, price, stock };
   products.push(newProduct);
   res.status(201).json(newProduct);
+};
 
-  if (!name || !price || stock === undefined) {
-    return res.status(400).json({ message: "Missing required fields" });
+export const updateProduct = (req, res) => {
+  const id = Number(req.params.id);
+  const productIndex = products.findIndex((item) => item.id === id);
+  if (productIndex === -1) {
+    return res.status(404).json({ message: "Product not found" });
   }
+  const { name, price, stock } = req.body;
+  const updatedProduct = { id, name, price, stock };
+  products[productIndex] = updatedProduct;
+  res.json(updatedProduct);
+};
 
-  if (name !== "string" || price !== "number") {
-    return res
-      .status(400)
-      .json({ message: "Invalid data types for name or price" });
+export const deleteProduct = (req, res) => {
+  const id = Number(req.params.id);
+  const productIndex = products.findIndex((item) => item.id === id);
+  if (productIndex === -1) {
+    return res.status(404).json({ message: "Product not found" });
   }
-
-  if (stock && Number.isInteger(stock) && stock >= 0) {
-    const newProduct = { id: nextId, name, price, stock };
-    products.push(newProduct);
-    res.status(201).json(newProduct);
-  } else {
-    res.status(400).json({ message: "Invalid stock value" });
-  }
+  products.splice(productIndex, 1);
+  res.status(204).send();
 };
